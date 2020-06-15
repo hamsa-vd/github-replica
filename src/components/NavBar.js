@@ -4,7 +4,7 @@ import axios from 'axios';
 function NavBar() {
 	const initialval = {
 		input: 'freeCodeCamp',
-		select: 'users'
+		select: 'repositories'
 	};
 	const [ submit, setSubmit ] = useState(false);
 	const [ inputVal, setInputVal ] = useState(initialval.input);
@@ -16,7 +16,11 @@ function NavBar() {
 			axios
 				.get(`https://api.github.com/search/${selectVal}?q=${inputVal}+in:name`)
 				.then((res) => {
-					setGitData(res.data);
+					if (selectVal === 'users') setGitData(res.data.items);
+					else {
+						setGitData(res.data.items);
+						console.log(gitdata);
+					}
 				})
 				.catch((err) => console.log(err));
 			return () => {
@@ -66,7 +70,7 @@ function NavBar() {
 			<div className="container row my-2 mx-auto">
 				{gitdata &&
 					selectVal === 'users' &&
-					gitdata['items'].map((v) => (
+					gitdata.map((v) => (
 						<div key={v.id} className="card col-lg-4 col-md-6 col-sm-12">
 							<img src={v['avatar_url']} className="card-img-top img-responsive" alt="unable to find" />
 							<h4 className="card-title">{v.login}</h4>
@@ -76,6 +80,28 @@ function NavBar() {
 								<button className="btn btn-info col-4 m-2">orgs</button>
 								<button className="btn btn-info col-4 m-2">repos</button>
 								<button className="btn btn-info col-6 m-2">subscriptions</button>
+							</div>
+						</div>
+					))}
+				{gitdata &&
+					selectVal === 'repositories' &&
+					gitdata.map((v) => (
+						<div key={v.id} className="card col-lg-4 col-md-6 col-sm-12">
+							<img
+								src={v.owner['avatar_url']}
+								className="card-img-top img-responsive"
+								alt="unable to find"
+							/>
+							<h4 className="card-title">{v['full_name']}</h4>
+							<div className="card-body container row mx-auto">
+								<a href={v['html_url']} className="btn btn-info col-4 m-2">
+									visit
+								</a>
+								<button className="btn btn-info col-4 m-2">commits</button>
+								<button className="btn btn-info col-5 m-2">comments</button>
+								<button className="btn btn-info col-4 m-2">events</button>
+								<button className="btn btn-info col-5 m-2">stargazers</button>
+								<button className="btn btn-info col-5 m-2">subscribers</button>
 							</div>
 						</div>
 					))}
